@@ -18,6 +18,7 @@ import { PromptTemplate } from "../types";
 import { TemplateCard } from "../components/TemplateCard";
 import { TemplateEditor } from "../components/TemplateEditor";
 import { usePromptTemplates } from "../hooks/usePromptTemplates";
+import { ProgressService } from "../services/progressService";
 
 interface TemplatesScreenProps {
   navigation: any;
@@ -250,6 +251,12 @@ export const TemplatesScreen: React.FC<TemplatesScreenProps> = ({
   };
 
   const handleUseTemplate = (template: PromptTemplate) => {
+    // Rastreia uso do template
+    ProgressService.trackActivity("templateUsed", {
+      templateId: template.id,
+      topic: template.category,
+    });
+
     if (template.variables && template.variables.length > 0) {
       setSelectedTemplate(template);
       setShowVariableModal(true);

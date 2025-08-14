@@ -18,6 +18,7 @@ import { ChatInput } from "../components/ChatInput";
 import { Message, Conversation, CodeSnippet } from "../types";
 import { geminiService } from "../services/geminiService";
 import { storageService } from "../services/storageService";
+import { ProgressService } from "../services/progressService";
 import {
   generateId,
   formatConversationTitle,
@@ -161,6 +162,20 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
       currentConversation.messages = updatedMessages;
       currentConversation.updatedAt = new Date();
 
+      // Detecta linguagem se for código
+      const detectedLanguage =
+        messageType === "code" ? detectLanguage(content) : undefined;
+
+      // Detecta tópico baseado no tipo de mensagem
+      const detectedTopic =
+        messageType === "code"
+          ? "analise"
+          : messageType === "explanation"
+          ? "conceito"
+          : messageType === "review"
+          ? "revisao"
+          : "geral";
+
       // Chama API Gemini
       let response: string;
 
@@ -170,18 +185,41 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
           const code = codeMatch[1];
           const language = detectLanguage(code);
           response = await geminiService.analyzeCode(code, language);
+
+          // Rastreia análise de código
+          ProgressService.trackActivity("codeAnalysis", {
+            language: language || detectedLanguage,
+            topic: "analise",
+          });
         } else {
           response = await geminiService.sendMessage(
             content,
             messages.slice(-5)
           );
+
+          // Rastreia pergunta geral
+          ProgressService.trackActivity("question", {
+            language: detectedLanguage,
+            topic: detectedTopic,
+          });
         }
       } else if (messageType === "explanation") {
         const conceptMatch = content.match(/explique (?:o conceito )?(.+)/i);
         const concept = conceptMatch ? conceptMatch[1] : content;
         response = await geminiService.explainConcept(concept);
+
+        // Rastreia pergunta de explicação
+        ProgressService.trackActivity("question", {
+          topic: "conceito",
+        });
       } else {
         response = await geminiService.sendMessage(content, messages.slice(-5));
+
+        // Rastreia pergunta geral
+        ProgressService.trackActivity("question", {
+          language: detectedLanguage,
+          topic: detectedTopic,
+        });
       }
 
       // Cria mensagem de resposta

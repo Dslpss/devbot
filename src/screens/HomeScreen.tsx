@@ -50,16 +50,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       route: "Templates",
     },
     {
+      title: "Dashboard de Progresso",
+      description: "Acompanhe sua evolução e estatísticas",
+      icon: "stats-chart" as any,
+      route: "Progress",
+    },
+    {
       title: "Configurações",
       description: "Configure sua API key e preferências",
       icon: "settings" as any,
       route: "Settings",
-    },
-    {
-      title: "Temas",
-      description: "Personalize a aparência do aplicativo",
-      icon: "color-palette" as any,
-      route: "Theme",
     },
   ];
 

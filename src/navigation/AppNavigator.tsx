@@ -5,11 +5,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomeScreen } from "../screens/HomeScreen";
 import { ChatScreen } from "../screens/ChatScreen";
 import { QuizScreen } from "../screens/QuizScreen";
-import { SettingsScreen } from "../screens/SettingsScreenSimple";
+import { SettingsScreen } from "../screens/SettingsScreen";
 import { ThemeScreen } from "../screens/ThemeScreen";
 import { SnippetsScreen } from "../screens/SnippetsScreen";
 import { HistoryScreen } from "../screens/HistoryScreen";
 import { TemplatesScreen } from "../screens/TemplatesScreen";
+import { ProgressScreen } from "../screens/ProgressScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,7 @@ export const AppNavigator = () => {
         <Stack.Screen name="Snippets" component={SnippetsScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />
         <Stack.Screen name="Templates" component={TemplatesScreen} />
+        <Stack.Screen name="Progress" component={ProgressScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

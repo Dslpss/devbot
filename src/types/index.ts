@@ -45,6 +45,57 @@ export interface AppSettings {
   favoriteConversations?: string[];
 }
 
+export interface DailyStats {
+  date: string; // YYYY-MM-DD
+  questions: number;
+  codeAnalyses: number;
+  templatesUsed: number;
+  timeSpent: number; // em minutos
+  languages: string[];
+  topics: string[];
+}
+
+export interface ProgressData {
+  totalQuestions: number;
+  totalCodeAnalyses: number;
+  totalTemplatesUsed: number;
+  currentStreak: number;
+  longestStreak: number;
+  favoriteLanguages: LanguageStats[];
+  favoriteTopics: TopicStats[];
+  dailyStats: DailyStats[];
+  weeklyStats: WeeklyStats[];
+  monthlyStats: MonthlyStats[];
+}
+
+export interface LanguageStats {
+  language: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
+export interface TopicStats {
+  topic: string;
+  count: number;
+  percentage: number;
+  category: "codigo" | "conceito" | "debug" | "revisao" | "geral";
+}
+
+export interface WeeklyStats {
+  week: string; // YYYY-WW
+  questions: number;
+  averagePerDay: number;
+  mostActiveDay: string;
+}
+
+export interface MonthlyStats {
+  month: string; // YYYY-MM
+  questions: number;
+  averagePerDay: number;
+  growth: number; // percentual vs mês anterior
+}
+
 export interface PromptTemplate {
   id: string;
   title: string;
