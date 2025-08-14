@@ -138,38 +138,120 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
         expert: "nível expert - desafios para especialistas",
       }[level.id];
 
-      const prompt = `Você é um especialista em ${topic.title}. Gere exatamente ${level.questionsCount} perguntas de múltipla escolha sobre este tema para o ${levelDescription}.
+      // Gerar múltiplos elementos únicos para forçar variação
+      const currentTimestamp = Date.now();
+      const randomSeed = Math.floor(Math.random() * 100000);
+      const dateString = new Date().toISOString();
 
-IMPORTANTE: Responda APENAS com um JSON válido, sem texto adicional.
+      // Arrays de contextos que mudam a perspectiva completamente
+      const randomContexts = [
+        "desenvolvimento web moderno",
+        "projetos empresariais",
+        "aplicações mobile",
+        "sistemas de alta performance",
+        "soluções em nuvem",
+        "APIs e microserviços",
+        "interfaces de usuário",
+        "arquiteturas escaláveis",
+        "desenvolvimento full-stack",
+        "aplicações em tempo real",
+        "sistemas distribuídos",
+        "plataformas de e-commerce",
+      ];
 
-Exemplo do formato JSON correto:
+      const focusAreas = [
+        "debugging e resolução de problemas",
+        "otimização de performance",
+        "segurança e boas práticas",
+        "integração com outras tecnologias",
+        "padrões de design e arquitetura",
+        "testes e qualidade de código",
+        "deploy e produção",
+        "manutenção e refatoração",
+        "escalabilidade e confiabilidade",
+        "experiência do usuário",
+        "acessibilidade e inclusão",
+        "monitoramento e observabilidade",
+      ];
+
+      // Múltiplos elementos aleatórios para máxima variação
+      const randomContext =
+        randomContexts[Math.floor(Math.random() * randomContexts.length)];
+      const focusArea =
+        focusAreas[Math.floor(Math.random() * focusAreas.length)];
+      const additionalSeed = Math.random().toString(36).substring(7);
+
+      const sessionId = `${topic.id}_${level.id}_${currentTimestamp}_${randomSeed}_${additionalSeed}`;
+
+      console.log("🎯 Iniciando geração de perguntas:", {
+        topic: topic.title,
+        level: level.title,
+        sessionId,
+        context: randomContext,
+        focus: focusArea,
+        timestamp: dateString,
+      });
+
+      const prompt = `CONTEXTO ÚNICO: Você está criando um quiz para desenvolvedores trabalhando com ${randomContext}, focando em ${focusArea}.
+
+MISSÃO: Como especialista em ${topic.title}, gere ${level.questionsCount} perguntas COMPLETAMENTE DIFERENTES sobre este tema para ${levelDescription}.
+
+INSTRUÇÕES CRÍTICAS:
+- Use o contexto "${randomContext}" para criar cenários únicos
+- Foque em "${focusArea}" para dar direcionamento específico
+- NUNCA repita padrões de perguntas comuns
+- Crie situações práticas e reais do dia a dia
+- Session ID: ${sessionId}
+- Timestamp: ${dateString}
+
+FORMATO OBRIGATÓRIO (JSON apenas):
 {
   "questions": [
     {
-      "text": "Qual das seguintes é uma característica do JavaScript?",
-      "options": ["Tipagem estática", "Tipagem dinâmica", "Não tem tipos", "Apenas números"],
+      "text": "Em um projeto de ${randomContext}, qual abordagem é mais eficaz para ${topic.title}?",
+      "options": ["Opção A específica", "Opção B específica", "Opção C específica", "Opção D específica"],
       "correctAnswer": 1,
-      "hint": "Pense sobre como o JavaScript determina o tipo de uma variável durante a execução do código.",
-      "explanation": "JavaScript tem tipagem dinâmica, onde o tipo da variável é determinado em tempo de execução."
+      "hint": "Considere o contexto de ${randomContext} e ${focusArea}",
+      "explanation": "Explicação detalhada considerando ${randomContext}"
     }
   ]
 }
 
-Gere ${level.questionsCount} perguntas sobre: ${topic.description}
-Nível de dificuldade: ${levelDescription}
+TEMA ESPECÍFICO: ${topic.description} aplicado em ${randomContext}
+NÍVEL: ${levelDescription}
+FOCO: ${focusArea}
+QUANTIDADE: ${level.questionsCount} perguntas ÚNICAS
 
-Cada pergunta deve ter:
-- text: pergunta clara sobre ${topic.title}
-- options: 4 opções válidas
-- correctAnswer: índice da resposta correta (0, 1, 2 ou 3)
-- hint: dica lógica sutil que ajude o raciocínio sem dar a resposta direta
-- explanation: explicação detalhada
+ÂNGULOS OBRIGATÓRIOS A VARIAR:
+1. Cenários de ${randomContext}
+2. Problemas de ${focusArea}
+3. Casos extremos e edge cases
+4. Comparações entre alternativas
+5. Situações de debugging
+6. Decisões arquiteturais
+7. Trade-offs e limitações
+8. Integração com outras ferramentas
 
-Para o nível ${level.title}:
-${level.description}`;
+IMPORTANTE: Baseie cada pergunta em situações REAIS que um desenvolvedor enfrentaria em ${randomContext}!
+
+GERE AGORA perguntas COMPLETAMENTE DIFERENTES das típicas sobre ${topic.title}:`;
 
       console.log("🚀 Gerando perguntas para:", topic.title);
-      const response = await geminiService.sendMessage(prompt, []);
+
+      // Adicionar prefixo anti-repetição para quebrar padrões da IA
+      const antiRepetitionPrefix = `ATENÇÃO: Esta é uma nova sessão de quiz. Ignore completamente qualquer padrão de perguntas anteriores. Você deve criar perguntas TOTALMENTE ORIGINAIS baseadas no contexto específico fornecido. Não use exemplos genéricos ou comuns.
+
+CONTEXTO ESPECÍFICO DESTA SESSÃO:
+- Ambiente: ${randomContext}
+- Foco técnico: ${focusArea}
+- Timestamp único: ${dateString}
+- Session ID: ${sessionId}
+
+`;
+
+      const finalPrompt = antiRepetitionPrefix + prompt;
+
+      const response = await geminiService.sendMessage(finalPrompt, []);
       console.log("📝 Resposta bruta da API:", response);
 
       // Limpa a resposta removendo markdown e espaços
@@ -249,11 +331,27 @@ ${level.description}`;
         }
       }
 
-      // Adiciona IDs únicos
+      // Verificar perguntas duplicadas
+      const questionTexts = jsonData.questions.map((q: any) =>
+        q.text.toLowerCase().trim()
+      );
+      const uniqueTexts = new Set(questionTexts);
+      if (uniqueTexts.size !== questionTexts.length) {
+        console.warn("⚠️ Detectadas perguntas duplicadas, regenerando...");
+        throw new Error("Perguntas duplicadas detectadas na resposta da IA");
+      }
+
+      console.log("✅ Perguntas validadas:", {
+        total: jsonData.questions.length,
+        unique: uniqueTexts.size,
+        sessionId,
+      });
+
+      // Adiciona IDs únicos com sessionId
       const questionsWithIds = jsonData.questions.map(
         (q: any, index: number) => ({
           ...q,
-          id: `${topic.id}_${index}_${Date.now()}`,
+          id: `${sessionId}_${index}`,
         })
       );
 
@@ -267,11 +365,26 @@ ${level.description}`;
       setCurrentStep("quiz");
     } catch (error: any) {
       console.error("💥 Erro detalhado:", error);
-      Alert.alert(
-        "Erro na Geração",
-        `Detalhes: ${error.message}\n\nTente usar o botão de teste da API primeiro para verificar a conexão.`,
-        [{ text: "OK" }, { text: "Testar API", onPress: () => testAPI() }]
-      );
+
+      if (error.message.includes("duplicadas")) {
+        Alert.alert(
+          "Perguntas Duplicadas",
+          "A IA gerou perguntas repetidas. Tente novamente para obter perguntas únicas.",
+          [
+            {
+              text: "Tentar Novamente",
+              onPress: () => generateQuestions(topic, level),
+            },
+            { text: "Cancelar", style: "cancel" },
+          ]
+        );
+      } else {
+        Alert.alert(
+          "Erro na Geração",
+          `Detalhes: ${error.message}\n\nTente usar o botão de teste da API primeiro para verificar a conexão.`,
+          [{ text: "OK" }, { text: "Testar API", onPress: () => testAPI() }]
+        );
+      }
     } finally {
       setLoading(false);
     }
