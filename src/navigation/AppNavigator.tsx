@@ -8,6 +8,8 @@ import { QuizScreen } from "../screens/QuizScreen";
 import { SettingsScreen } from "../screens/SettingsScreenSimple";
 import { ThemeScreen } from "../screens/ThemeScreen";
 import { SnippetsScreen } from "../screens/SnippetsScreen";
+import { HistoryScreen } from "../screens/HistoryScreen";
+import { TemplatesScreen } from "../screens/TemplatesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,8 @@ export const AppNavigator = () => {
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="Theme" component={ThemeScreen} />
         <Stack.Screen name="Snippets" component={SnippetsScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="Templates" component={TemplatesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

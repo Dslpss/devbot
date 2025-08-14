@@ -42,6 +42,26 @@ export interface AppSettings {
   fontSize: "small" | "medium" | "large";
   hapticFeedback: boolean;
   autoSave: boolean;
+  favoriteConversations?: string[];
+}
+
+export interface PromptTemplate {
+  id: string;
+  title: string;
+  description: string;
+  template: string;
+  category:
+    | "code"
+    | "explanation"
+    | "analysis"
+    | "conversion"
+    | "example"
+    | "custom";
+  isCustom: boolean;
+  variables?: string[]; // Variables like {language}, {code}, {concept}
+  createdAt: Date;
+  updatedAt?: Date;
+  usageCount: number;
 }
 
 export interface CodeSnippet {

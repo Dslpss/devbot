@@ -26,6 +26,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       route: "Chat",
     },
     {
+      title: "Histórico de Conversas",
+      description: "Busque e gerencie suas conversas anteriores",
+      icon: "time" as any,
+      route: "History",
+    },
+    {
       title: "Quiz de Programação",
       description: "Teste seus conhecimentos com perguntas geradas por IA",
       icon: "school" as any,
@@ -36,6 +42,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       description: "Salve e organize seus códigos favoritos",
       icon: "library" as any,
       route: "Snippets",
+    },
+    {
+      title: "Templates de Prompts",
+      description: "Use templates predefinidos ou crie seus próprios",
+      icon: "document-text" as any,
+      route: "Templates",
     },
     {
       title: "Configurações",

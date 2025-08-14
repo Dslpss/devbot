@@ -365,6 +365,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
 
           <TouchableOpacity
             style={styles.headerAction}
+            onPress={() => navigation?.navigate("History")}
+          >
+            <Ionicons name="time-outline" size={24} color={theme.text} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.headerAction}
             onPress={() => navigation?.navigate("Settings")}
           >
             <Ionicons name="settings" size={24} color={theme.text} />

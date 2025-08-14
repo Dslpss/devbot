@@ -440,6 +440,36 @@ class StorageService {
     }
   }
 
+  // Métodos genéricos para qualquer tipo de dados
+  async saveData<T>(key: string, data: T): Promise<void> {
+    try {
+      const jsonValue = JSON.stringify(data);
+      await AsyncStorage.setItem(key, jsonValue);
+    } catch (error) {
+      console.error(`Erro ao salvar dados (${key}):`, error);
+      throw new Error(`Não foi possível salvar os dados: ${key}`);
+    }
+  }
+
+  async getData<T>(key: string): Promise<T | null> {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (error) {
+      console.error(`Erro ao carregar dados (${key}):`, error);
+      return null;
+    }
+  }
+
+  async removeData(key: string): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch (error) {
+      console.error(`Erro ao remover dados (${key}):`, error);
+      throw new Error(`Não foi possível remover os dados: ${key}`);
+    }
+  }
+
   async getStorageInfo(): Promise<{
     used: number;
     conversations: number;
