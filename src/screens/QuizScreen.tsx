@@ -41,6 +41,7 @@ interface Question {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  hint?: string;
   difficulty?: string;
 }
 
@@ -120,6 +121,7 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   // Estado para modal customizado
   const [customModalVisible, setCustomModalVisible] = useState(false);
   const [customTopicText, setCustomTopicText] = useState("");
@@ -147,6 +149,7 @@ Exemplo do formato JSON correto:
       "text": "Qual das seguintes é uma característica do JavaScript?",
       "options": ["Tipagem estática", "Tipagem dinâmica", "Não tem tipos", "Apenas números"],
       "correctAnswer": 1,
+      "hint": "Pense sobre como o JavaScript determina o tipo de uma variável durante a execução do código.",
       "explanation": "JavaScript tem tipagem dinâmica, onde o tipo da variável é determinado em tempo de execução."
     }
   ]
@@ -159,6 +162,7 @@ Cada pergunta deve ter:
 - text: pergunta clara sobre ${topic.title}
 - options: 4 opções válidas
 - correctAnswer: índice da resposta correta (0, 1, 2 ou 3)
+- hint: dica lógica sutil que ajude o raciocínio sem dar a resposta direta
 - explanation: explicação detalhada
 
 Para o nível ${level.title}:
@@ -295,6 +299,7 @@ ${level.description}`;
     setQuestions([]);
     setSelectedAnswer(null);
     setShowExplanation(false);
+    setShowHint(false);
     setCurrentQuestion(0);
     setScore(0);
     setShowResult(false);
@@ -386,6 +391,7 @@ ${level.description}`;
   const nextQuestion = () => {
     setSelectedAnswer(null);
     setShowExplanation(false);
+    setShowHint(false);
     if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
@@ -402,6 +408,7 @@ ${level.description}`;
     setShowResult(false);
     setSelectedAnswer(null);
     setShowExplanation(false);
+    setShowHint(false);
     setCurrentStep("topic");
   };
 
@@ -645,6 +652,44 @@ ${level.description}`;
             {questions[currentQuestion]?.text || "Carregando pergunta..."}
           </Text>
 
+          {/* Botão de Dica */}
+          {questions[currentQuestion]?.hint && selectedAnswer === null && (
+            <TouchableOpacity
+              style={styles.hintButton}
+              onPress={() => setShowHint(!showHint)}
+            >
+              <Ionicons
+                name="bulb-outline"
+                size={16}
+                color={theme.primary}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={[styles.hintButtonText, { color: theme.primary }]}>
+                {showHint ? "Ocultar Dica" : "Ver Dica"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Dica */}
+          {showHint && questions[currentQuestion]?.hint && (
+            <View
+              style={[
+                styles.hintContainer,
+                { backgroundColor: theme.primaryLight },
+              ]}
+            >
+              <Ionicons
+                name="bulb"
+                size={18}
+                color={theme.primary}
+                style={{ marginRight: 8 }}
+              />
+              <Text style={[styles.hintText, { color: theme.primary }]}>
+                {questions[currentQuestion]?.hint}
+              </Text>
+            </View>
+          )}
+
           <View style={styles.options}>
             {questions[currentQuestion]?.options?.map((option, index) => (
               <TouchableOpacity
@@ -813,6 +858,35 @@ const createStyles = (theme: any) =>
       fontWeight: "600",
       color: theme.text,
       marginBottom: 16,
+    },
+    hintButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      padding: 8,
+      borderRadius: 20,
+      backgroundColor: theme.primaryLight,
+      marginBottom: 12,
+    },
+    hintButtonText: {
+      fontSize: 14,
+      fontWeight: "500",
+    },
+    hintContainer: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 16,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.primary,
+    },
+    hintText: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: "500",
+      fontStyle: "italic",
+      lineHeight: 20,
     },
     options: {
       marginTop: 16,
